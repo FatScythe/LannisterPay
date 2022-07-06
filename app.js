@@ -58,93 +58,84 @@ let sortSplit = sample.SplitInfo.sort((a,b) => {
 });
 
 // Sorted Sample Payload
-const Object = sortSplit.reverse();
-console.log(Object, "PayLoad as been sorted here!!!");
+const input = sortSplit.reverse();
+console.log(input, "PayLoad as been sorted here!!!");
 
 // Computation for flat, percentage and ratio;
 let balance = sample.Amount;
-let totalRatio = Object.map((i, index) => {
+let sum = 0;
+let totalRatio = input.map((i, index) => {
     if(i.SplitType === 'RATIO'){
-        console.log(new Array (i.SplitValue))
-        // return {SplitValue : i.SplitValue};
+        sum += i.SplitValue;
     }
 });
+console.log(sum, 'Total Ratio in the Sample Payload');
 
-// console.log(totalRatio);
-// totalRatio.map((ratio, index) => {
-//     if(ratio !== undefined) {
-//         console.log();
-//     }
+
+let computeFiat = (balance, value) => {
+    let amount = value; 
+    newBalance = balance - amount;
+    return {newBalance, amount};
+}
+
+let computePerc = (balance, value) => {
+    amount = (value / 100) * balance;
+    newBalance = balance - amount;
+    return {newBalance, amount};
+}
+
+let computeRatio = (balance, value) => {
+    amount = (value / sum) * balance;
+    newBalance = (balance - amount);
+    return {newBalance, amount};
+}
+
+
+const output = input.map((item, index) => {
+    if(index == 0){
+        compute = computeFiat(balance, item.SplitValue);
+        return {
+            "SplitEntityId" : `LNPYACC${index}`,
+            "Amount" : compute.amount,
+            };
+        }
+
+    let prevBalance = compute.newBalance;
+
+    if(index > 0) {
+        if(item.SplitType === 'FLAT') {
+            compute = computeFiat(prevBalance, item.SplitValue);
+            prevBalance = compute.newBalance;
+            return {
+                "SplitEntityId" : `LNPYACC${index}`,
+                "Amount" : compute.amount,
+                "Balance" : compute.newBalance
+                }
+            } 
+        if(item.SplitType === 'PERCENTAGE') {
+            let prevBalance = compute.newBalance;
+            console.log();
+            compute = computePerc(prevBalance, item.SplitValue);
+            return {
+                "SplitEntityId" : `LNPYACC${index}`,
+                "Amount" : compute.amount,
+                "Balance" : compute.newBalance
+                } 
+            } 
     
-// })
-
-
-
-// let computeFiat = (balance, value) => {
-//     let amount = value; 
-//     newBalance = balance - amount;
-//     return {newBalance, amount};
-// }
-
-// let computePerc = (balance, value) => {
-//     amount = (value / 100) * balance;
-//     newBalance = balance - amount;
-//     return {newBalance, amount};
-// }
-
-// let computeRatio = (balance, value) => {
-//     amount = (value / totalRatio) * balance;
-//     newBalance = (balance - amount);
-//     return {newBalance, amount};
-// }
-
-
-// const input = Object;
-// const output = input.map((item, index) => {
-//     if(index == 0){
-//         compute = computeFiat(balance, item.SplitValue);
-//         return {
-//             "SplitEntityId" : `LNPYACC${index}`,
-//             "Amount" : compute.amount,
-//             };
-//         }
-
-//     let prevBalance = compute.newBalance;
-
-//     if(index > 0) {
-//         if(item.SplitType === 'FLAT') {
-//             compute = computeFiat(prevBalance, item.SplitValue);
-//             prevBalance = compute.newBalance;
-//             return {
-//                 "SplitEntityId" : `LNPYACC${index}`,
-//                 "Amount" : compute.amount,
-//                 "Balance" : compute.newBalance
-//                 }
-//             } 
-//         if(item.SplitType === 'PERCENTAGE') {
-//             let prevBalance = compute.newBalance;
-//             console.log();
-//             compute = computePerc(prevBalance, item.SplitValue);
-//             return {
-//                 "SplitEntityId" : `LNPYACC${index}`,
-//                 "Amount" : compute.amount,
-//                 "Balance" : compute.newBalance
-//                 } 
-//             } 
-    
-//             if(item.SplitType === 'RATIO') {
-//                 compute = computeRatio(prevBalance, item.SplitValue);
-//                 prevBalance = compute.newBalance;
-//                 return {
-//                     "SplitEntityId" : `LNPYACC${index}`,
-//                     "Amount" : compute.amount,
-//                     "Balance" : compute.newBalance
-//                }
+            if(item.SplitType === 'RATIO') {
+                compute = computeRatio(prevBalance, item.SplitValue);
+                prevBalance = compute.newBalance;
+                return {
+                    "SplitEntityId" : `LNPYACC${index}`,
+                    "Amount" : compute.amount,
+                    "Balance" : compute.newBalance
+               }
         
-//             }
-//     }
+            }
+    }
 
-// });
+});
 
 // sampleResponse
-// console.log(output, "output");
+console.log(output, "SampleResponse here!!!");

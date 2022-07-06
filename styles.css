@@ -3,3 +3,16 @@
     padding: 0;
     font-family: sans-serif;
 }
+body {
+    display: grid;
+    place-items: center;
+}
+
+.card {
+    max-width: 80%;
+    min-width: 400px;
+    padding: 10px 16px;
+    margin: 20px 0;
+    border-radius: 4px;
+    box-shadow: 1px 3px 5px rgba(0,0,0,0.6);
+}
