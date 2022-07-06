@@ -40,6 +40,18 @@ const sample = {
     ]
 }
 
+// The SplitInfo array can contain a minimum of 1 split entity and a maximum of 20 entities.
+if(sample.SplitInfo < 1) {
+    const error = 'SplitInfo must be at least one';
+    console.log(error);
+}else if(sample.SplitInfo > 20) {
+    const error = 'SplitInfo must not be more than 20';
+    console.log(error);
+} else {
+    let sortSplit;
+}
+
+
 // = Rule 2 =
 // The order of precedence for the SplitType is:
 
@@ -47,7 +59,7 @@ const sample = {
 // PERCENTAGE types should be computed before RATIO types.
 // RATIO types should always be computed last.
 // SORTING SamplePayload
-let sortSplit = sample.SplitInfo.sort((a,b) => {
+sortSplit = sample.SplitInfo.sort((a,b) => {
     if(a.SplitType > b.SplitType) {
             return -1;
     } else if(b.SplitType > a.SplitType) {
@@ -71,29 +83,28 @@ let totalRatio = input.map((i, index) => {
 });
 console.log(sum, 'Total Ratio in the Sample Payload');
 
-
-let computeFiat = (balance, value) => {
-    let amount = value; 
-    newBalance = balance - amount;
-    return {newBalance, amount};
-}
-
-let computePerc = (balance, value) => {
-    amount = (value / 100) * balance;
-    newBalance = balance - amount;
-    return {newBalance, amount};
-}
-
-let computeRatio = (balance, value) => {
-    amount = (value / sum) * balance;
-    newBalance = (balance - amount);
-    return {newBalance, amount};
-}
-
-
 const output = input.map((item, index) => {
+    let computeAll = (balance, value) => {
+        if(item.SplitType === 'FLAT') {
+            let amount = value; 
+            newBalance = balance - amount;
+            return {newBalance, amount};
+        }
+        if(item.SplitType === 'PERCENTAGE') {
+            amount = (value / 100) * balance;
+            newBalance = balance - amount;
+            return {newBalance, amount};
+        }
+        if(item.SplitType === 'RATIO') {
+            amount = (value / sum) * balance;
+            newBalance = (balance - amount);
+            return {newBalance, amount};
+        }
+    
+    }
+    
     if(index == 0){
-        compute = computeFiat(balance, item.SplitValue);
+        compute = computeAll(balance, item.SplitValue);
         return {
             "SplitEntityId" : `LNPYACC${index}`,
             "Amount" : compute.amount,
@@ -103,39 +114,23 @@ const output = input.map((item, index) => {
     let prevBalance = compute.newBalance;
 
     if(index > 0) {
-        if(item.SplitType === 'FLAT') {
-            compute = computeFiat(prevBalance, item.SplitValue);
-            prevBalance = compute.newBalance;
-            return {
-                "SplitEntityId" : `LNPYACC${index}`,
-                "Amount" : compute.amount,
-                "Balance" : compute.newBalance
-                }
-            } 
-        if(item.SplitType === 'PERCENTAGE') {
-            let prevBalance = compute.newBalance;
-            console.log();
-            compute = computePerc(prevBalance, item.SplitValue);
-            return {
-                "SplitEntityId" : `LNPYACC${index}`,
-                "Amount" : compute.amount,
-                "Balance" : compute.newBalance
-                } 
-            } 
-    
-            if(item.SplitType === 'RATIO') {
-                compute = computeRatio(prevBalance, item.SplitValue);
-                prevBalance = compute.newBalance;
-                return {
-                    "SplitEntityId" : `LNPYACC${index}`,
-                    "Amount" : compute.amount,
-                    "Balance" : compute.newBalance
-               }
-        
-            }
-    }
-
+        prevBalance = compute.newBalance;
+        compute = computeAll(prevBalance, item.SplitValue);
+        return {
+            "SplitEntityId" : `LNPYACC${index}`,
+            "Amount" : compute.amount,
+            // "Balance" : compute.newBalance
+            };
+        }
 });
 
-// sampleResponse
-console.log(output, "SampleResponse here!!!");
+console.log(output);
+
+// SAMPLE RESPONSE
+const sampleResponse = {
+    "ID": 13092,
+    "Balance": 0,
+    "SplitBreakdown": [output]
+}
+
+console.log(sampleResponse, "SampleResponse here!!!");
