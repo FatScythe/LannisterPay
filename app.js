@@ -1,128 +1,6 @@
 // https://flutterwave.stoplight.io/docs/2022-tech-heroes/ZG9jOjQxNjU5MTAz-lannister-pay-tpss
 
 // Sample Payload
-const SP = {
-    ID: 1308,
-    Amount: 12580,
-    Currency: "NGN",
-    CustomerEmail: "anon8@customers.io",
-    SplitInfo: [
-        {
-            SplitType: "FLAT",
-            SplitValue: 45,
-            SplitEntityId: "LNPYACC0019"
-        },
-        {
-            SplitType: "RATIO",
-            SplitValue: 3,
-            SplitEntityId: "LNPYACC0011"
-        },
-        {
-            SplitType: "PERCENTAGE",
-            SplitValue: 3,
-            SplitEntityId: "LNPYACC0015"
-        }
-    ]
-}
-
-// SAMPLE RESPONSE
-
-const SR = {
-    ID: 13092,
-    Balance: 0,
-    SplitBreakdown: [
-        {
-            SplitEntityId: "LNPYACC0019",
-            Amount: 450
-        },
-        {
-            SplitEntityId: "LNPYACC0011",
-            Amount: 2450
-        },
-        {
-            SplitEntityId: "LNPYACC0015",
-            Amount: 48
-        },
-        {
-            SplitEntityId: "LNPYACC0215",
-            Amount: 155.2
-        },
-        {
-            SplitEntityId: "LNPYACC0011",
-            Amount: 838.08
-        },
-        {
-            SplitEntityId: "LNPYACC0016",
-            Amount: 558.72
-        }
-
-    ]
-}
-
-
-// sorting an array of objects
-const lists = [
-    {
-        type : "PERCENTAGE",
-        value: 5
-    },
-    {
-        type : "RATIO",
-        value: 8
-    },
-    {
-        type : "FLAT",
-        value: 45
-    }
-];
-
-let sort = lists.sort((a,b) => {
-    if(a.type > b.type) {
-        return -1;
-    } else if(b.type > a.type) {
-        return 1
-    } else {
-        return 0;
-    }
-});
-// console.log(sort.reverse())
-
-// console.log(lists[1].type > lists[0].type )
-
-// // SAMPLE RESPONSE
-
-// const SR = {
-//     ID: 13092,
-//     Balance: 0,
-//     SplitBreakdown: [
-//         {
-//             SplitEntityId: "LNPYACC0019",
-//             Amount: 450
-//         },
-//         {
-//             SplitEntityId: "LNPYACC0011",
-//             Amount: 2450
-//         },
-//         {
-//             SplitEntityId: "LNPYACC0015",
-//             Amount: 48
-//         },
-//         {
-//             SplitEntityId: "LNPYACC0215",
-//             Amount: 155.2
-//         },
-//         {
-//             SplitEntityId: "LNPYACC0011",
-//             Amount: 838.08
-//         },
-//         {
-//             SplitEntityId: "LNPYACC0016",
-//             Amount: 558.72
-//         }
-
-//     ]
-// }
-
 const sample = {
     "ID": 13092,
     "Amount": 4500,
@@ -162,7 +40,13 @@ const sample = {
     ]
 }
 
-// Sorting Payload
+// = Rule 2 =
+// The order of precedence for the SplitType is:
+
+// FLAT types should be computed before PERCENTAGE OR RATIO types
+// PERCENTAGE types should be computed before RATIO types.
+// RATIO types should always be computed last.
+// SORTING SamplePayload
 let sortSplit = sample.SplitInfo.sort((a,b) => {
     if(a.SplitType > b.SplitType) {
             return -1;
@@ -174,201 +58,93 @@ let sortSplit = sample.SplitInfo.sort((a,b) => {
 });
 
 // Sorted Sample Payload
-const Object = sortSplit;
-console.log(Object, "Object");
+const Object = sortSplit.reverse();
+console.log(Object, "PayLoad as been sorted here!!!");
 
-// Compute
+// Computation for flat, percentage and ratio;
 let balance = sample.Amount;
-let newBalance;
-let finalBalance;
-let totalRatio = 5;
-
-let computeFiat = (balance, value) => {
-    let amount = value; 
-    newBalance = balance - amount;
-    return {newBalance, amount};
-};
-
-let computePerc = (balance, value) => {
-    amount = (value / 100) * balance;
-    newBalance = balance - amount;
-    return {newBalance, amount};
-}
-
-let computeRatio = (balance, value) => {
-    amount = (value / totalRatio) * balance;
-    newBalance = (balance - amount);
-    return {newBalance, amount};
-}
-
-// let compute = (balance, value) => {
-//     if(Object.SplitType === 'FLAT') {
-//         amount = value; 
-//         newBalance = balance - amount;
-//         return {newBalance, amount};
-//     }
-//     if(Object.SplitType === 'PERCENTAGE') {
-//         amount = (value / 100) * balance;
-//         newBalance = balance - amount;
-//         return {newBalance, amount};
-//     } 
-//     if(Object.SplitType === 'RATIO') {
-//         amount = (value / totalRatio) * balance;
-//         newBalance = (balance - amount);
-//         return {newBalance, amount};
-//     }
-// }
-
-
-
-
-// const output = Object.reverse().map((obj, index) => {
-//     // let previousBal = Object[index - 1].
-//     // if(index == 0) {
-//         compute(sample.amount, obj.SplitValue)
-//     // }
-//     // if(index > 0) {
-//         // compute(350, obj.SplitValue)
-//     // }
-//     console.log(obj);
-// });
-
-// console.log(output);
-
-// const output = Object.map((item, index) => {
-//     let balance = sample.Amount;
-//     let newBalance = Object.
-// });
-
-
-
-
-const output = Object.reverse().map((item, index) => {
-    let balance = sample.Amount;
-    // let prevBalance = Object[index - 1].Balance;
-    // let finalBalance = Object
-    if(index == 0){
-        compute = computeFiat(balance, item.SplitValue);
-        return {
-            "SplitEntityId" : `LNPYACC${index}`,
-            "Amount" : compute.amount,
-            "Balance" : compute.newBalance
-            };
-        }
-    console.log(item[0]);
-    if(index > 0) {
-        return item;
+let totalRatio = Object.map((i, index) => {
+    if(i.SplitType === 'RATIO'){
+        console.log(new Array (i.SplitValue))
+        // return {SplitValue : i.SplitValue};
     }
-    // if(item.SplitType === 'FLAT') {
-    //     compute = computeFiat(prevBalance, item.SplitValue);
-    //     return {
-    //         "SplitEntityId" : `LNPYACC${index}`,
-    //         "Amount" : compute.amount,
-    //         "Balance" : compute.newBalance
-    //         }
-    //     } 
-    // if(item.SplitType === 'PERCENTAGE') {
-    //     compute = computePerc(sample.Amount, item.SplitValue)
-    //     return {
-    //         "SplitEntityId" : `LNPYACC${index}`,
-    //         "Amount" : compute.amount,
-    //         "Balance" : compute.newBalance
-    //         } 
-    //     } 
-
-    //     if(item.SplitType === 'RATIO') {
-    //         compute = computeRatio(sample.Amount, item.SplitValue)
-    //         return {
-    //             "SplitEntityId" : `LNPYACC${index}`,
-    //             "Amount" : compute.amount,
-    //             "Balance" : compute.newBalance
-    //        }
-    
-    //     }
 });
 
-output.map((obj, index) => {
-    console.log(obj, index);
-})
-console.log(output, "output")
-let prevBalance = output[0].Balance;
-console.log(prevBalance);
+// console.log(totalRatio);
+// totalRatio.map((ratio, index) => {
+//     if(ratio !== undefined) {
+//         console.log();
+//     }
+    
+// })
 
 
 
+// let computeFiat = (balance, value) => {
+//     let amount = value; 
+//     newBalance = balance - amount;
+//     return {newBalance, amount};
+// }
 
+// let computePerc = (balance, value) => {
+//     amount = (value / 100) * balance;
+//     newBalance = balance - amount;
+//     return {newBalance, amount};
+// }
 
-const sampleResponse = {
-    "ID": 13092,
-    "sortSplit" : sortSplit.reverse(),
-    "SplitBreakdown" : [
-    {
-        "SplitEntityId": "LNPYACC0019",
-        "Amount": 450
-    },
-    {
-        "SplitEntityId": "LNPYACC0011",
-        "Amount": 2450
-    },
-    {
-        "SplitEntityId": "LNPYACC0015",
-        "Amount": 48
-    },
-    {
-        "SplitEntityId": "LNPYACC0215",
-        "Amount": 155.2
-    },
-    {
-        "SplitEntityId": "LNPYACC0011",
-        "Amount": 838.08
-    },
-    {
-        "SplitEntityId": "LNPYACC0016",
-        "Amount": 558.72
-    }
-
-    ]
-}
-
-// console.log(sampleResponse.sortSplit);
-
-
-// const sampleResponse = {
-//     "ID": 13092,
-//     "Balance": Initialbalance,
-//     "SplitBreakdown": [
-//         {
-//             "SplitEntityId": "LNPYACC0019",
-//             "Amount": 450
-//         },
-//         {
-//             "SplitEntityId": "LNPYACC0011",
-//             "Amount": 2450
-//         },
-//         {
-//             "SplitEntityId": "LNPYACC0015",
-//             "Amount": 48
-//         },
-//         {
-//             "SplitEntityId": "LNPYACC0215",
-//             "Amount": 155.2
-//         },
-//         {
-//             "SplitEntityId": "LNPYACC0011",
-//             "Amount": 838.08
-//         },
-//         {
-//             "SplitEntityId": "LNPYACC0016",
-//             "Amount": 558.72
-//         }
-
-//     ]
+// let computeRatio = (balance, value) => {
+//     amount = (value / totalRatio) * balance;
+//     newBalance = (balance - amount);
+//     return {newBalance, amount};
 // }
 
 
+// const input = Object;
+// const output = input.map((item, index) => {
+//     if(index == 0){
+//         compute = computeFiat(balance, item.SplitValue);
+//         return {
+//             "SplitEntityId" : `LNPYACC${index}`,
+//             "Amount" : compute.amount,
+//             };
+//         }
 
+//     let prevBalance = compute.newBalance;
 
+//     if(index > 0) {
+//         if(item.SplitType === 'FLAT') {
+//             compute = computeFiat(prevBalance, item.SplitValue);
+//             prevBalance = compute.newBalance;
+//             return {
+//                 "SplitEntityId" : `LNPYACC${index}`,
+//                 "Amount" : compute.amount,
+//                 "Balance" : compute.newBalance
+//                 }
+//             } 
+//         if(item.SplitType === 'PERCENTAGE') {
+//             let prevBalance = compute.newBalance;
+//             console.log();
+//             compute = computePerc(prevBalance, item.SplitValue);
+//             return {
+//                 "SplitEntityId" : `LNPYACC${index}`,
+//                 "Amount" : compute.amount,
+//                 "Balance" : compute.newBalance
+//                 } 
+//             } 
+    
+//             if(item.SplitType === 'RATIO') {
+//                 compute = computeRatio(prevBalance, item.SplitValue);
+//                 prevBalance = compute.newBalance;
+//                 return {
+//                     "SplitEntityId" : `LNPYACC${index}`,
+//                     "Amount" : compute.amount,
+//                     "Balance" : compute.newBalance
+//                }
+        
+//             }
+//     }
 
-// let text = JSON.stample)ringify(s
-// // JSON.parse(sample);
-// console.log(text);
+// });
+
+// sampleResponse
+// console.log(output, "output");
