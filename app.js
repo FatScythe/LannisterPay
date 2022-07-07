@@ -108,28 +108,32 @@ const output = input.map((item, index) => {
         return {
             "SplitEntityId" : `LNPYACC${index}`,
             "Amount" : compute.amount,
+            "Balance" : compute.newBalance
             };
         }
 
-    let prevBalance = compute.newBalance;
+        let prevBalance = compute.newBalance;
 
-    if(index > 0) {
-        prevBalance = compute.newBalance;
+        console.log(prevBalance)
         compute = computeAll(prevBalance, item.SplitValue);
+        prevBalance = compute.newBalance;
         return {
             "SplitEntityId" : `LNPYACC${index}`,
             "Amount" : compute.amount,
-            // "Balance" : compute.newBalance
-            };
-        }
+            "Balance" : compute.newBalance
+            }
+
 });
 
 console.log(output);
 
+let lastIndex = input.length - 1;
+
+
 // SAMPLE RESPONSE
 const sampleResponse = {
-    "ID": 13092,
-    "Balance": 0,
+    "ID": sample.ID,
+    "Balance": output[lastIndex].Balance,
     "SplitBreakdown": [output]
 }
 
